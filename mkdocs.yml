@@ -13,6 +13,8 @@ nav:
     - advanced/dns.md
     - advanced/firewall.md
     - advanced/reverse_proxy.md
+    - advanced/podman.md
+    - advanced/s3_uploads.md
 
 markdown_extensions:
   - admonition

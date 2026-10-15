@@ -142,6 +142,7 @@
     - mod_restrict_federation
     - mod_protect_last_admin
     - mod_c2s_limit_sessions
+    - mod_track_muc_joins
 
 - name: Enable wanted modules (snikket-modules)
   file:
@@ -162,6 +163,7 @@
     - mod_snikket_server_vcard
     - mod_snikket_billing
     - mod_snikket_version
+    - mod_http_upload_s3
 
 - name: "Install mod_firewall rules"
   copy:

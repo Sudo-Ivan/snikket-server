@@ -3,3 +3,17 @@ SNIKKET_DOMAIN=example.com
 
 # The email address of the primary admin
 SNIKKET_ADMIN_EMAIL=admin@example.com
+
+# Maximum file upload size in megabytes (default 500)
+#SNIKKET_UPLOAD_FILE_SIZE_LIMIT_MB=500
+
+# Uncomment to store uploaded files in S3-compatible object storage
+# instead of the local filesystem. See docs/advanced/s3_uploads.md.
+#SNIKKET_S3_BUCKET=
+#SNIKKET_S3_REGION=us-east-1
+#SNIKKET_S3_ENDPOINT=
+#SNIKKET_S3_PATH_STYLE=0
+#SNIKKET_S3_ACCESS_KEY=
+#SNIKKET_S3_SECRET_KEY=
+#SNIKKET_S3_PUBLIC_URL=
+#SNIKKET_S3_PREFIX=

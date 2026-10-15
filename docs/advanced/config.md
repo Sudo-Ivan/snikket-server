@@ -19,7 +19,7 @@ In most situations, the configuration options shown in the example config in
 Also, it is very likely not complete.
 {{< /panel >}}
 
-After modifying any options in snikket.conf, you must run 'docker compose up -d' to apply the changes.
+After modifying any options in snikket.conf, you must run 'docker compose up -d' (or 'podman compose up -d') to apply the changes.
 
 ## Configuration Option Reference
 
@@ -58,7 +58,7 @@ The amount of file storage used is affected by the configured retention period (
 
 ### `SNIKKET_DAILY_UPLOAD_LIMIT_PER_USER_GB`
 
-Use this option to define an upload limit for each user. By default the daily upload limit per user is set to 1 GB (it equals ten times the maximum file size, which is currently defined as 100 MB).
+Use this option to define an upload limit for each user. By default the daily upload limit per user equals ten times the maximum file size (so 5 GB with the default file size limit).
 
 If the limit is reached, the affected user will be unable to upload new files and has to wait for the next day.
 
@@ -67,6 +67,17 @@ Example:
 ```
 # Allow no more than 1.5GB disk space to be used by uploaded files
 SNIKKET_DAILY_UPLOAD_LIMIT_PER_USER_GB=1.5
+```
+
+### `SNIKKET_UPLOAD_FILE_SIZE_LIMIT_MB`
+
+The maximum size of a single uploaded file, in megabytes. Defaults to 500.
+
+Example:
+
+```
+# Allow files up to 1GB
+SNIKKET_UPLOAD_FILE_SIZE_LIMIT_MB=1000
 ```
 
 ### `SNIKKET_LOGLEVEL`

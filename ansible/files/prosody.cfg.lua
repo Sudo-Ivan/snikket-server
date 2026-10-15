@@ -11,6 +11,7 @@ local DOMAIN = Lua.assert(ENV_SNIKKET_DOMAIN, "Please set the SNIKKET_DOMAIN env
 local RETENTION_DAYS = Lua.tonumber(ENV_SNIKKET_RETENTION_DAYS) or 7;
 local UPLOAD_STORAGE_GB = Lua.tonumber(ENV_SNIKKET_UPLOAD_STORAGE_GB);
 local DAILY_UPLOAD_LIMIT_PER_USER_GB = Lua.tonumber(ENV_SNIKKET_DAILY_UPLOAD_LIMIT_PER_USER_GB);
+local UPLOAD_FILE_SIZE_LIMIT_MB = Lua.tonumber(ENV_SNIKKET_UPLOAD_FILE_SIZE_LIMIT_MB) or 500;
 
 if Lua.prosody.process_type == "prosody" and not Lua.prosody.config_loaded then
 	-- Wait at startup for certificates
@@ -420,30 +421,50 @@ Component ("groups."..DOMAIN) "muc"
 	muc_registration_include_form = true
 
 
-Component ("share."..DOMAIN) "http_file_share"
-	-- For backwards compat, allow HTTP upload on the base domain
-	if ENV_SNIKKET_TWEAK_SHARE_DOMAIN ~= "1" then
-		http_host = "share."..DOMAIN
-		http_external_url = "https://share."..DOMAIN.."/"
-	end
+if ENV_SNIKKET_S3_BUCKET then
+	Component ("share."..DOMAIN) "http_upload_s3"
 
-	-- 128 bits (i.e. 16 bytes) is the maximum length of a GCM auth tag, which
-	-- is appended to encrypted uploads according to XEP-0454. This ensures we
-	-- allow files up to the size limit even if they are encrypted.
-	http_file_share_size_limit = (1024 * 1024 * 100) + 16 -- 100MB + 16 bytes
-	http_file_share_expires_after = 60 * 60 * 24 * RETENTION_DAYS -- N days
-	if DAILY_UPLOAD_LIMIT_PER_USER_GB then
-		http_file_share_daily_quota = 1024 * 1024 * 1024 * DAILY_UPLOAD_LIMIT_PER_USER_GB
-	end
-	if UPLOAD_STORAGE_GB then
-		http_file_share_global_quota = 1024 * 1024 * 1024 * UPLOAD_STORAGE_GB
-	end
-	http_paths = {
-		file_share = "/upload"
-	}
+		s3_bucket = ENV_SNIKKET_S3_BUCKET
+		s3_region = ENV_SNIKKET_S3_REGION or "us-east-1"
+		s3_endpoint = ENV_SNIKKET_S3_ENDPOINT
+		s3_access_key = ENV_SNIKKET_S3_ACCESS_KEY or FileLine("/snikket/prosody/s3-access-key")
+		s3_secret_key = ENV_SNIKKET_S3_SECRET_KEY or FileLine("/snikket/prosody/s3-secret-key")
+		s3_path_style = ENV_SNIKKET_S3_PATH_STYLE == "1"
+		s3_public_url = ENV_SNIKKET_S3_PUBLIC_URL
+		s3_key_prefix = ENV_SNIKKET_S3_PREFIX
+		s3_put_expiry = Lua.tonumber(ENV_SNIKKET_S3_PUT_EXPIRY)
+		s3_get_expiry = Lua.tonumber(ENV_SNIKKET_S3_GET_EXPIRY)
+		s3_file_size_limit = (1024 * 1024 * UPLOAD_FILE_SIZE_LIMIT_MB) + 16
 
-	modules_disabled = {
-		"s2s";
-	}
+		modules_disabled = {
+			"s2s";
+		}
+else
+	Component ("share."..DOMAIN) "http_file_share"
+		-- For backwards compat, allow HTTP upload on the base domain
+		if ENV_SNIKKET_TWEAK_SHARE_DOMAIN ~= "1" then
+			http_host = "share."..DOMAIN
+			http_external_url = "https://share."..DOMAIN.."/"
+		end
+
+		-- 128 bits (i.e. 16 bytes) is the maximum length of a GCM auth tag, which
+		-- is appended to encrypted uploads according to XEP-0454. This ensures we
+		-- allow files up to the size limit even if they are encrypted.
+		http_file_share_size_limit = (1024 * 1024 * UPLOAD_FILE_SIZE_LIMIT_MB) + 16 -- N MB + 16 bytes
+		http_file_share_expires_after = 60 * 60 * 24 * RETENTION_DAYS -- N days
+		if DAILY_UPLOAD_LIMIT_PER_USER_GB then
+			http_file_share_daily_quota = 1024 * 1024 * 1024 * DAILY_UPLOAD_LIMIT_PER_USER_GB
+		end
+		if UPLOAD_STORAGE_GB then
+			http_file_share_global_quota = 1024 * 1024 * 1024 * UPLOAD_STORAGE_GB
+		end
+		http_paths = {
+			file_share = "/upload"
+		}
+
+		modules_disabled = {
+			"s2s";
+		}
+end
 
 Include (ENV_SNIKKET_TWEAK_EXTRA_CONFIG or "/snikket/prosody/*.cfg.lua")
