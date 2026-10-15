@@ -71,12 +71,12 @@ jobs:
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: ${{ matrix.context }}
-          push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64
-          compression: zstd
-          force-compression: true
+          # compression/force-compression are exporter attrs in build-push-action v7,
+          # so they must be passed via outputs rather than dedicated inputs
+          outputs: ${{ github.event_name != 'pull_request' && 'type=image,push=true,compression=zstd,force-compression=true,oci-mediatypes=true' || 'type=cacheonly' }}
           cache-from: type=gha,scope=${{ matrix.component }}
           cache-to: type=gha,mode=max,scope=${{ matrix.component }}
           build-args: |
