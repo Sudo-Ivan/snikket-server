@@ -1,0 +1,67 @@
+name: portal-tests
+
+on:
+  push:
+    branches:
+      - master
+      - main
+    paths:
+      - "web-portal/**"
+      - ".github/workflows/portal-tests.yml"
+  pull_request:
+    paths:
+      - "web-portal/**"
+      - ".github/workflows/portal-tests.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mypy:
+    runs-on: ubuntu-latest
+    name: "typecheck: mypy"
+    defaults:
+      run:
+        working-directory: web-portal
+    steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25 # v2.22.1
+        with:
+          egress-policy: audit
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+      - name: Install
+        run: |
+          set -euo pipefail
+          pip install mypy
+          pip install -r requirements.txt
+          pip install -r build-requirements.txt
+      - name: Typecheck
+        run: |
+          python -m mypy --config mypy.ini -p snikket_web
+
+  linting:
+    runs-on: ubuntu-latest
+    name: "lint: flake8"
+    defaults:
+      run:
+        working-directory: web-portal
+    steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25 # v2.22.1
+        with:
+          egress-policy: audit
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+      - name: Install
+        run: |
+          set -euo pipefail
+          pip install flake8 flake8-print
+      - name: Linting
+        run: |
+          make flake8

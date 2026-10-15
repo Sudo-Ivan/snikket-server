@@ -1,0 +1,17 @@
+[Unit]
+Description=Snikket server (Prosody, coturn)
+After=network-online.target
+Wants=network-online.target
+
+[Container]
+Image=ghcr.io/sudo-ivan/snikket-server:edge
+ContainerName=snikket
+Network=host
+EnvironmentFile=snikket.conf
+Volume=snikket_data:/snikket
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=default.target

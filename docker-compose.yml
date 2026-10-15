@@ -1,9 +1,13 @@
+# Works with both `docker compose` and `podman compose` (or podman-compose).
+# Prebuilt images are published to ghcr.io/sudo-ivan/; the build: contexts
+# let you build locally instead (e.g. `podman compose build`).
 version: "3.3"
 
 services:
   snikket_proxy:
     container_name: snikket-proxy
-    image: snikket/snikket-web-proxy:dev
+    image: ghcr.io/sudo-ivan/snikket-web-proxy:edge
+    build: ./web-proxy
     env_file: snikket.conf
     network_mode: host
     volumes:
@@ -12,7 +16,8 @@ services:
     restart: "unless-stopped"
   snikket_certs:
     container_name: snikket-certs
-    image: snikket/snikket-cert-manager:dev
+    image: ghcr.io/sudo-ivan/snikket-cert-manager:edge
+    build: ./cert-manager
     network_mode: host
     env_file: snikket.conf
     volumes:
@@ -21,14 +26,16 @@ services:
     restart: "unless-stopped"
   snikket_portal:
     container_name: snikket-portal
-    image: snikket/snikket-web-portal:dev
+    image: ghcr.io/sudo-ivan/snikket-web-portal:edge
+    build: ./web-portal
     network_mode: host
     env_file: snikket.conf
     restart: "unless-stopped"
 
   snikket_server:
     container_name: snikket
-    image: snikket/snikket-server:dev
+    image: ghcr.io/sudo-ivan/snikket-server:edge
+    build: .
     network_mode: host
     volumes:
       - snikket_data:/snikket

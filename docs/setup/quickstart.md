@@ -91,6 +91,8 @@ in a clean way that works reliably across all different systems.
 
 If you have the `docker` and `docker compose` commands already available on your system, great! You can skip to Step 3 below. If not, continue reading.
 
+**Podman also works:** the compose file is compatible with `podman compose`, and Quadlet units for systemd are provided in `contrib/podman/`. See [Podman](../advanced/podman.md).
+
 #### docker
 
 Getting docker up and running can vary depending on what OS you're running. Luckily Docker provides an installation guide

@@ -1,0 +1,17 @@
+[Unit]
+Description=Snikket certificate manager (certbot)
+After=snikket-proxy.service
+
+[Container]
+Image=ghcr.io/sudo-ivan/snikket-cert-manager:edge
+ContainerName=snikket-certs
+Network=host
+EnvironmentFile=snikket.conf
+Volume=snikket_data:/snikket
+Volume=acme_challenges:/var/www/.well-known/acme-challenge
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=default.target

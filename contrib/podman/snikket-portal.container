@@ -1,0 +1,15 @@
+[Unit]
+Description=Snikket web portal
+After=snikket-proxy.service snikket-server.service
+
+[Container]
+Image=ghcr.io/sudo-ivan/snikket-web-portal:edge
+ContainerName=snikket-portal
+Network=host
+EnvironmentFile=snikket.conf
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=default.target
