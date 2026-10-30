@@ -1,8 +1,6 @@
 # Works with both `docker compose` and `podman compose` (or podman-compose).
 # Prebuilt images are published to ghcr.io/sudo-ivan/; the build: contexts
 # let you build locally instead (e.g. `podman compose build`).
-version: "3.3"
-
 services:
   snikket_proxy:
     container_name: snikket-proxy

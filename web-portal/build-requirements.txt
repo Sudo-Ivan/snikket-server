@@ -1,3 +1,5 @@
-mypy
-python-dotenv~=0.15
-types-toml
+mypy==2.4.0
+python-dotenv~=1.2.4
+types-toml==0.10.8.20260518
+flake8==7.4.0
+flake8-print==5.0.0

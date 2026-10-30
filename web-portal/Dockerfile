@@ -36,8 +36,8 @@ RUN set -eu; \
     apt-get update ; \
     apt-get install -y --no-install-recommends \
       netcat-traditional python3 python3-setuptools python3-pip \
-      python3-typing-extensions ; \
-      pip3 install --break-system-packages -r requirements.txt; \
+      python3-typing-extensions; \
+    pip3 install --break-system-packages -r requirements.txt; \
     apt-get remove -y --purge python3-pip python3-setuptools; \
     apt-get clean ; rm -rf /var/lib/apt/lists; \
     rm -rf /root/.cache;

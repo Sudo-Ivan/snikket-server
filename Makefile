@@ -10,22 +10,22 @@ DOCS := $(docs/**.md)
 all: images
 
 images:
-	$(ENGINE) build -t snikket/snikket-server:$(TAG) .
-	$(ENGINE) build -t snikket/snikket-web-proxy:$(TAG) web-proxy
-	$(ENGINE) build -t snikket/snikket-cert-manager:$(TAG) cert-manager
-	$(ENGINE) build -t snikket/snikket-web-portal:$(TAG) web-portal
+	$(ENGINE) build --pull -t snikket/snikket-server:$(TAG) .
+	$(ENGINE) build --pull -t snikket/snikket-web-proxy:$(TAG) web-proxy
+	$(ENGINE) build --pull -t snikket/snikket-cert-manager:$(TAG) cert-manager
+	$(ENGINE) build --pull -t snikket/snikket-web-portal:$(TAG) web-portal
 
 server:
-	$(ENGINE) build -t snikket/snikket-server:$(TAG) .
+	$(ENGINE) build --pull -t snikket/snikket-server:$(TAG) .
 
 portal:
-	$(ENGINE) build -t snikket/snikket-web-portal:$(TAG) web-portal
+	$(ENGINE) build --pull -t snikket/snikket-web-portal:$(TAG) web-portal
 
 proxy:
-	$(ENGINE) build -t snikket/snikket-web-proxy:$(TAG) web-proxy
+	$(ENGINE) build --pull -t snikket/snikket-web-proxy:$(TAG) web-proxy
 
 certs:
-	$(ENGINE) build -t snikket/snikket-cert-manager:$(TAG) cert-manager
+	$(ENGINE) build --pull -t snikket/snikket-cert-manager:$(TAG) cert-manager
 
 site: mkdocs.yml $(DOCS)
 	echo $(DOCS)
