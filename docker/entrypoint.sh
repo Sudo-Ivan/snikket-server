@@ -36,6 +36,39 @@ fi
 
 chown -R prosody:prosody /var/spool/anacron /var/run/prosody /snikket/prosody /etc/prosody
 
+## Give the TURN service access only to its own database and shared TLS keys
+chgrp turnserver /snikket/prosody
+chmod 0710 /snikket/prosody
+install -d -o turnserver -g turnserver -m 0700 /snikket/prosody/turnserver
+chown turnserver:turnserver /snikket/prosody/turnserver
+chmod 0700 /snikket/prosody/turnserver
+if test -f /snikket/prosody/turndb && ! test -e /snikket/prosody/turnserver/turndb; then
+	mv /snikket/prosody/turndb /snikket/prosody/turnserver/turndb
+fi
+if test -f /snikket/prosody/turnserver/turndb; then
+	chown turnserver:turnserver /snikket/prosody/turnserver/turndb
+	chmod 0600 /snikket/prosody/turnserver/turndb
+fi
+
+for path in /snikket/letsencrypt /snikket/letsencrypt/live \
+  /snikket/letsencrypt/archive /snikket/letsencrypt/live/* \
+  /snikket/letsencrypt/archive/*; do
+	if [ -d "$path" ]; then
+		chgrp 65532 "$path"
+		chmod 0750 "$path"
+	fi
+done
+
+for cert in /snikket/letsencrypt/live/*/fullchain.pem \
+	  /snikket/letsencrypt/archive/*/fullchain*.pem \
+	  /snikket/letsencrypt/live/*/privkey.pem \
+	  /snikket/letsencrypt/archive/*/privkey*.pem; do
+	if [ -f "$cert" ]; then
+		chgrp 65532 "$cert"
+		chmod 0640 "$cert"
+	fi
+done
+
 ## Generate secret for coturn auth if necessary
 if ! test -f /snikket/prosody/turn-auth-secret-v2; then
 	head -c 32 /dev/urandom | base64 > /snikket/prosody/turn-auth-secret-v2;

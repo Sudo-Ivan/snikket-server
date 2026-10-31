@@ -7,19 +7,39 @@
     install_recommends: no
 - name: "Use Lua 5.4 by default"
   command: update-alternatives --set lua-interpreter /usr/bin/lua5.4
-- name: "Add Prosody package repo"
-  template:
-    dest: /etc/apt/sources.list.d/prosody.sources
-    src: ../files/prosody.sources
-    owner: root
-    group: root
-    mode: 0644
-- name: "Install Prosody package"
+- name: "Install Prosody runtime dependencies"
   apt:
-    name: "{{ prosody.package }}"
+    name:
+      - lua-expat
+      - lua-filesystem
+      - lua-sec
+      - lua-socket
+      - libicu76
+      - libssl3t64
+      - openssl
+      - procps
+      - ssl-cert
     state: present
     install_recommends: no
-    update_cache: yes
+- name: "Create Prosody group"
+  group:
+    name: prosody
+    system: yes
+- name: "Create Prosody user"
+  user:
+    name: prosody
+    group: prosody
+    system: yes
+    home: /var/lib/prosody
+    create_home: no
+    shell: /usr/sbin/nologin
+- name: "Create Prosody config directory"
+  file:
+    state: directory
+    path: /etc/prosody
+    owner: root
+    group: root
+    mode: 0755
 - name: "Deploy Prosody config"
   copy:
     src: ../files/prosody.cfg.lua
@@ -28,6 +48,13 @@
   file:
     state: directory
     path: /snikket/prosody
+    owner: prosody
+    group: prosody
+    mode: 0750
+- name: "Create Prosody runtime directory"
+  file:
+    state: directory
+    path: /var/run/prosody
     owner: prosody
     group: prosody
     mode: 0750
@@ -58,17 +85,6 @@
   loop:
     - localhost.crt
     - localhost.key
-- name: "Disable Prosody init script"
-  service:
-    name: prosody
-    enabled: no
-    use: sysvinit
-- name: "Stop Prosody if running"
-  service:
-    name: prosody
-    state: stopped
-    use: sysvinit
-
 - name: "Create Prosody modules source directory"
   file:
     state: directory
@@ -120,7 +136,6 @@
     - mod_measure_active_users
     - mod_measure_lua
     - mod_measure_malloc
-    - mod_http_xep227
     - mod_sasl2
     - mod_sasl2_bind2
     - mod_sasl2_sm
@@ -189,9 +204,9 @@
     state: present
     install_recommends: no
 
-- name: "Install Prosody-Migrator"
+- name: "Install Prosody-Migrator SQLite driver"
   apt:
-    name: prosody-migrator-trunk
+    name: lua-dbi-sqlite3
     state: present
     install_recommends: no
 - name: "Copy Prosody-Migrator config"

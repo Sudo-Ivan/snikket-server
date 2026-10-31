@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/opt/certbot/bin/python
 
 import requests
 import sys

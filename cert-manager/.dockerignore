@@ -1,0 +1,6 @@
+.git
+.github
+.direnv
+.venv
+__pycache__
+*.py[cod]

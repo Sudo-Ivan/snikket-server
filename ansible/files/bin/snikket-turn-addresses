@@ -1,5 +1,8 @@
 #!/usr/bin/env lua
 
+package.path = "/usr/lib/?.lua;/usr/lib/?/init.lua;"..package.path;
+package.cpath = "/usr/lib/?.so;"..package.cpath;
+
 package.loaded["prosody.net.server"] = require "prosody.net.server_epoll";
 
 local net = require "prosody.util.net";

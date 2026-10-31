@@ -17,8 +17,33 @@ has_errors () {
 	return;
 }
 
+share_certificates_with_proxy () {
+	local proxy_gid=${SNIKKET_CERT_PROXY_GID:-65532}
+	local path
+	local key
+
+	for path in /snikket/letsencrypt /snikket/letsencrypt/live \
+	  /snikket/letsencrypt/archive /snikket/letsencrypt/live/* \
+	  /snikket/letsencrypt/archive/*; do
+		if [[ -d "$path" ]]; then
+			chgrp "$proxy_gid" "$path"
+			chmod 0750 "$path"
+		fi
+	done
+
+	for cert in /snikket/letsencrypt/live/*/fullchain.pem \
+	  /snikket/letsencrypt/archive/*/fullchain*.pem \
+	  /snikket/letsencrypt/live/*/privkey.pem \
+	  /snikket/letsencrypt/archive/*/privkey*.pem; do
+		if [[ -f "$cert" ]]; then
+			chgrp "$proxy_gid" "$cert"
+			chmod 0640 "$cert"
+		fi
+	done
+}
+
 try_cert () {
-	if su letsencrypt -- -c "certbot certonly -n --webroot --webroot-path /var/www \
+	if su letsencrypt -- -c "/opt/certbot/bin/certbot certonly -n --webroot --webroot-path /var/www \
 	  --cert-path /etc/ssl/certbot \
 	  --keep ${SNIKKET_CERTBOT_OPTIONS-} $SNIKKET_CERTBOT_KEY_OPTIONS \
 	  --agree-tos --email \"$SNIKKET_ADMIN_EMAIL\" --expand \
@@ -34,6 +59,7 @@ try_cert () {
 	sed -n '/^{/,/^}/p' /var/log/letsencrypt/letsencrypt.log \
 	  | jq -r '(select(.status=="invalid").challenges | .[].error?.detail ), select(.detail).detail' \
 	  > /var/log/letsencrypt/errors.log;
+	share_certificates_with_proxy
 
 	if [[ "$certbot_failed" == "1" ]] || has_errors; then
 		touch /snikket/letsencrypt/has-errors;

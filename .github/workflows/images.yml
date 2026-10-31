@@ -78,6 +78,8 @@ jobs:
           # so they must be passed via outputs rather than dedicated inputs
           outputs: ${{ github.event_name != 'pull_request' && 'type=image,push=true,compression=zstd,force-compression=true,oci-mediatypes=true' || 'type=cacheonly' }}
           pull: true
+          sbom: true
+          provenance: mode=max
           cache-from: type=gha,scope=${{ matrix.component }}
           cache-to: type=gha,mode=max,scope=${{ matrix.component }}
           build-args: |

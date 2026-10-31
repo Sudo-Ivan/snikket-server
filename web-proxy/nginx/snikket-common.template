@@ -1,4 +1,4 @@
-root /var/www/html;
+root /tmp/www;
 
 location / {
 	try_files $uri /static/$uri @portal;

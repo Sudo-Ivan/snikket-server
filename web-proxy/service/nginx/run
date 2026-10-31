@@ -1,3 +1,3 @@
 #!/bin/sh -e
 
-exec /usr/sbin/nginx -g "daemon off;"
+exec /usr/bin/nginx -e /dev/stderr -g "daemon off;"

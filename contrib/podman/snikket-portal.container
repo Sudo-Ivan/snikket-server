@@ -1,12 +1,20 @@
 [Unit]
 Description=Snikket web portal
-After=snikket-proxy.service snikket-server.service
+After=snikket-proxy.service snikket-server.service snikket-portal-data-volume.service
+Requires=snikket-portal-data-volume.service
 
 [Container]
 Image=ghcr.io/sudo-ivan/snikket-web-portal:edge
 ContainerName=snikket-portal
 Network=host
 EnvironmentFile=snikket.conf
+User=65532
+Group=65532
+ReadOnly=true
+ReadOnlyTmpfs=true
+DropCapability=all
+NoNewPrivileges=true
+Volume=snikket_portal_data:/snikket
 
 [Service]
 Restart=always

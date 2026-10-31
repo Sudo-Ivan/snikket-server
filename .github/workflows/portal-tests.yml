@@ -36,8 +36,8 @@ jobs:
       - name: Install
         run: |
           set -euo pipefail
-          pip install -r requirements.txt
-          pip install -r build-requirements.txt
+          pip install --require-hashes -r requirements.lock
+          pip install --require-hashes -r build-requirements.lock
       - name: Typecheck
         run: |
           python -m mypy --config mypy.ini -p snikket_web
@@ -60,7 +60,7 @@ jobs:
       - name: Install
         run: |
           set -euo pipefail
-          pip install -r build-requirements.txt
+          pip install --require-hashes -r build-requirements.lock
       - name: Linting
         run: |
           make flake8

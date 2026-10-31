@@ -14,10 +14,9 @@ Monorepo of the four Snikket server components:
 - `make images` builds all four; `make server|portal|proxy|certs` for one.
 - `ENGINE=podman|docker` overrides engine auto-detection (podman preferred
   when both exist). `TAG=dev` sets the tag.
-- Prosody version pins live in `ansible/snikket.yml`:
-  `prosody.snapshot` (date of the trixie snapshots suite at
-  packages.prosody.im) and `prosody_modules.revision` (hg rev of
-  hg.prosody.im/prosody-modules).
+- ProsodyX is pinned in the root `Dockerfile` by tag and commit. Snikket
+  module sources are pinned in `ansible/snikket.yml` with
+  `prosody_modules.revision`.
 
 ## Test locally
 

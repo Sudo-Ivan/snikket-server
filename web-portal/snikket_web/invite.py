@@ -11,31 +11,23 @@ from quart import (
     current_app,
     render_template,
     redirect,
-    request,
     url_for,
     session as http_session,
 )
 
 import werkzeug
 
-from flask_wtf.file import FileField
 import wtforms
 
-from flask_babel import lazy_gettext as _l, gettext
+from flask_babel import lazy_gettext as _l
 
-from .infra import async_form, client, selected_locale, BaseForm
+from .infra import client, selected_locale, BaseForm
 
 
 bp = Blueprint("invite", __name__)
 
 
 INVITE_SESSION_JID = "invite-session-jid"
-
-MAX_IMPORT_DATA_SIZE = 5*1024*1024  # 5MB
-SUPPORTED_IMPORT_TYPES = ["application/xml", "text/xml"]
-
-EIMPORTTOOBIG = _l("The account data you tried to import is too large to"
-                   " upload. Please contact your Snikket operator.")
 
 # https://play.google.com/store/apps/details?id=org.snikket.android&referrer={uri|urlescape}&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1
 
@@ -263,56 +255,12 @@ async def reset(id_: str) -> typing.Union[str, werkzeug.Response]:
     )
 
 
-class DataImportForm(BaseForm):
-    account_data_file = FileField(
-        _l("Account data file")
-    )
-
-    action_import = wtforms.SubmitField(
-        _l("Import data")
-    )
-
-
-@bp.route("/success", methods=["GET", "POST"])
+@bp.route("/success")
 @client.require_session()
 async def success() -> str:
-    form = await async_form(DataImportForm)
-
-    if form.validate_on_submit():
-        ok = True
-        file_info = (await request.files).get(form.account_data_file.name)
-        if file_info is not None:
-            mimetype = file_info.mimetype
-            data = file_info.stream.read()
-            if len(data) > MAX_IMPORT_DATA_SIZE:
-                form.account_data_file.errors.append(EIMPORTTOOBIG)
-                ok = False
-            elif mimetype not in SUPPORTED_IMPORT_TYPES:
-                form.account_data_file.errors.append(
-                    # not breaking the line here to avoid extract
-                    # translations failing (defensive)
-                    gettext("The account data you tried to import is in an unknown format. Please upload an XML file in XEP-0227 format (provided format: %(mimetype)s).", mimetype=mimetype),  # noqa:E501
-                )
-                ok = False
-            elif len(data) > 0:
-                await client.import_account_data(data)
-
-        if ok:
-            # Re-render success page, this time with no import option
-            return await render_template(
-                "invite_success.html",
-                jid=http_session.get(INVITE_SESSION_JID, ""),
-                migration_success=True,
-                    )
-
     return await render_template(
         "invite_success.html",
         jid=http_session.get(INVITE_SESSION_JID, ""),
-        migration_success=False,
-        form=form,
-        max_import_size=MAX_IMPORT_DATA_SIZE,
-        import_too_big_warning_header=_l("Error"),
-        import_too_big_warning=EIMPORTTOOBIG,
     )
 
 

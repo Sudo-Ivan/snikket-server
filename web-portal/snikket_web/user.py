@@ -1,12 +1,9 @@
 import asyncio
 import typing
-import urllib
 
 import quart_flask_patch  # noqa:F401
-import quart
 from quart import (
     Blueprint,
-    Response,
     render_template,
     request,
     redirect,
@@ -84,16 +81,6 @@ class ProfileForm(BaseForm):
 
     action_save = wtforms.SubmitField(
         _l("Update profile"),
-    )
-
-
-class ImportAccountDataForm(BaseForm):
-    account_data_file = FileField(
-        _l("Account data")
-    )
-
-    action_upload = wtforms.SubmitField(
-        _l("Upload"),
     )
 
 
@@ -198,46 +185,6 @@ async def profile() -> typing.Union[str, werkzeug.Response]:
                                  max_avatar_size=max_avatar_size,
                                  avatar_too_big_warning_header=_l("Error"),
                                  avatar_too_big_warning=EAVATARTOOBIG)
-
-
-class DataExportForm(BaseForm):
-    action_export = wtforms.SubmitField(
-        _l("Export")
-    )
-
-
-@bp.route("/manage_data", methods=["GET", "POST"])
-@client.require_session()
-async def manage_data() -> typing.Union[str, quart.Response]:
-    form = DataExportForm()
-
-    if form.validate_on_submit():
-        user_info = await client.get_user_info()
-        # The UTF-8 version of the filename needs to be percent-encoded
-        encoded_address = urllib.parse.quote(
-            user_info["address"].encode(encoding='utf-8', errors='strict')
-        )
-        account_data = await client.export_account_data()
-        if account_data is None:
-            await flash(
-                _("You currently have no account data to export."),
-                "alert"
-            )
-        else:
-            return Response(account_data,
-                            mimetype="application/xml",
-                            headers={
-                                # We provide the UTF-8 filename, but the ASCII
-                                # one will be used as a fallback for legacy
-                                # browsers (RFC 5987)
-                                "Content-Disposition": (
-                                    'attachment; filename="account-data.xml"; '
-                                    'filename*="UTF-8\'\'account-data-{}.xml"'
-                                ).format(encoded_address)
-                            })
-    return await render_template("user_manage_data.html",
-                                 form=form,
-                                 )
 
 
 @bp.route("/logout", methods=["GET", "POST"])

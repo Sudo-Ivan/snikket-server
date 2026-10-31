@@ -28,10 +28,13 @@ if [ "${SNIKKET_CERTS_WAIT-0}" = "1" ]; then
 	/usr/local/bin/wait_for_http.py "http://${SNIKKET_DOMAIN_ASCII}";
 fi
 
-# Run once, now
-/usr/sbin/anacron -d -n;
+# Run once now, then renew daily.
+if ! /etc/cron.daily/certbot; then
+	echo "EE: Certificate renewal job failed"
+fi
 
-# Run every hour
-while sleep 3600; do
-	/usr/sbin/anacron -d -n;
+while sleep 86400; do
+	if ! /etc/cron.daily/certbot; then
+		echo "EE: Certificate renewal job failed"
+	fi
 done

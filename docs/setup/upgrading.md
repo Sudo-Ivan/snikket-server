@@ -28,6 +28,81 @@ section of the troubleshooting guide before you upgrade:
 
 ## Upgrading
 
+### TURN database location
+
+If `/snikket/prosody/turndb` exists, the server moves it to
+`/snikket/prosody/turnserver/turndb` at startup. No manual migration step is
+needed.
+
+### Account data import and export
+
+The ProsodyX server build disables XEP-0227 account data import and export.
+This affects moving contacts, profiles, and personal event data through the
+portal. Existing account data remains in the server's live stores.
+
+### Preserve the portal session key
+
+The new portal image stores its session key in the `portal_data` volume. Older
+images stored the key in the container filesystem. If
+`SNIKKET_WEB_SECRET_KEY` is already set in `snikket.conf`, keep it through the
+first start of the new image. Otherwise, copy the old key before replacing the
+portal container:
+
+```console
+docker cp snikket-portal:/etc/snikket-web-portal/secret_key "$HOME/portal-secret-key"
+chmod 600 "$HOME/portal-secret-key"
+```
+
+With Podman, use `podman cp` instead of `docker cp`.
+
+Add the key to `snikket.conf`:
+
+```console
+printf '\nSNIKKET_WEB_SECRET_KEY=%s\n' "$(cat "$HOME/portal-secret-key")" >> snikket.conf
+chmod 600 snikket.conf
+```
+
+With Docker Compose, pull and start the new images:
+
+```console
+docker compose pull
+docker compose up -d
+docker compose logs snikket_portal
+```
+
+With Podman Compose, use `podman compose pull` and `podman compose up -d`. For
+Quadlet, copy the updated files from
+`contrib/podman/` to your Quadlet directory. Pull all four images, then reload
+systemd and restart the services:
+
+```console
+podman pull ghcr.io/sudo-ivan/snikket-server:edge
+podman pull ghcr.io/sudo-ivan/snikket-web-proxy:edge
+podman pull ghcr.io/sudo-ivan/snikket-cert-manager:edge
+podman pull ghcr.io/sudo-ivan/snikket-web-portal:edge
+systemctl --user daemon-reload
+systemctl --user restart snikket-server snikket-proxy snikket-certs snikket-portal
+journalctl --user -u snikket-portal
+```
+
+After the portal logs show `SNIKKET_WEB_SECRET_KEY persisted to /snikket/secret_key`,
+remove the `SNIKKET_WEB_SECRET_KEY` line from `snikket.conf` and restart the
+portal:
+
+```console
+sed -i '/^SNIKKET_WEB_SECRET_KEY=/d' snikket.conf
+docker compose up -d snikket_portal
+rm "$HOME/portal-secret-key"
+```
+
+With Podman Compose, use `podman compose up -d snikket_portal`. With Quadlet,
+restart `snikket-portal` with systemd after removing the key from the
+environment file.
+
+The volume now preserves the same key across container replacements. Back up
+`portal_data` with `snikket_data`. If you do not copy the key, existing browser
+sessions will need to sign in again.
+
 ### Snikket quick-start
 
 If you are using a version installed from the [original quick-start][] guide

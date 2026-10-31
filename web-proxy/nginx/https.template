@@ -15,7 +15,7 @@ server {
 
     server_name ${SNIKKET_DOMAIN_ASCII};
 
-    include "/etc/nginx/snippets/snikket-common.conf";
+    include "/tmp/nginx/snippets/snikket-common.conf";
 }
 
 server {
@@ -35,7 +35,7 @@ server {
 
     server_name share.${SNIKKET_DOMAIN_ASCII};
 
-    root /var/www/html;
+    root /tmp/www;
 
     location / {
         return 301 https://${SNIKKET_DOMAIN_ASCII}/;
@@ -69,7 +69,7 @@ server {
 
     server_name groups.${SNIKKET_DOMAIN_ASCII};
 
-    root /var/www/html;
+    root /tmp/www;
 
     location / {
         return 301 https://${SNIKKET_DOMAIN_ASCII}/;
@@ -95,7 +95,7 @@ server {
     error_page 404 /_errors/404_site.html;
 
     location = /_errors/404_site.html {
-        root /var/www/html;
+        root /tmp/www;
         internal;
     }
 

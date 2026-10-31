@@ -23,7 +23,7 @@ server {
     error_page 404 /_errors/404_site.html;
 
     location = /_errors/404_site.html {
-        root /var/www/html;
+        root /tmp/www;
         internal;
     }
 

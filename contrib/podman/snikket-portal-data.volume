@@ -1,0 +1,7 @@
+[Unit]
+Before=snikket-portal.service
+
+[Volume]
+VolumeName=snikket_portal_data
+UID=65532
+GID=65532

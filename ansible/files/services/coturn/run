@@ -5,8 +5,8 @@ if [ "$SNIKKET_TWEAK_TURNSERVER" = "0" ]; then
 	exit 0;
 fi
 
-CERTFILE="/etc/prosody/certs/$SNIKKET_DOMAIN_ASCII.crt";
-KEYFILE="/etc/prosody/certs/$SNIKKET_DOMAIN_ASCII.key";
+CERTFILE="/snikket/letsencrypt/live/$SNIKKET_DOMAIN_ASCII/fullchain.pem";
+KEYFILE="/snikket/letsencrypt/live/$SNIKKET_DOMAIN_ASCII/privkey.pem";
 
 echo "Waiting for certificates to become available..."
 while ! test -f "$CERTFILE" -a -f "$KEYFILE"; do
@@ -19,7 +19,9 @@ TURN_EXTERNAL_IP="$(snikket-turn-addresses "$SNIKKET_DOMAIN_ASCII")"
 min_port="${SNIKKET_TWEAK_TURNSERVER_MIN_PORT:-49152}"
 max_port="${SNIKKET_TWEAK_TURNSERVER_MAX_PORT:-65535}"
 
-exec s6-setuidgid turnserver /usr/bin/turnserver -c /etc/turnserver.conf --prod \
+umask 077
+
+exec s6-setuidgid turnserver /usr/bin/turnserver -c /etc/turnserver.conf --no-software-attribute \
      --static-auth-secret="$(cat /snikket/prosody/turn-auth-secret-v2)" \
      --cert="$CERTFILE" --pkey "$KEYFILE" -r "$SNIKKET_DOMAIN_ASCII" \
      --min-port "$min_port" --max-port "$max_port" \

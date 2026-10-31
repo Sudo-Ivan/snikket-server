@@ -1,0 +1,9 @@
+.git
+.github
+.direnv
+.venv
+snikket.conf
+docs
+web-portal
+web-proxy
+cert-manager
