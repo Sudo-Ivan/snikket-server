@@ -21,7 +21,7 @@ max_port="${SNIKKET_TWEAK_TURNSERVER_MAX_PORT:-65535}"
 
 umask 077
 
-exec s6-setuidgid turnserver /usr/bin/turnserver -c /etc/turnserver.conf --no-software-attribute \
+exec su-exec turnserver /usr/bin/turnserver -c /etc/turnserver.conf --no-software-attribute \
      --static-auth-secret="$(cat /snikket/prosody/turn-auth-secret-v2)" \
      --cert="$CERTFILE" --pkey "$KEYFILE" -r "$SNIKKET_DOMAIN_ASCII" \
      --min-port "$min_port" --max-port "$max_port" \

@@ -7,7 +7,7 @@ RUN set -eu; \
     rm -rf /var/lib/apt/lists/*
 
 
-FROM cgr.dev/chainguard/wolfi-base:latest@sha256:88a20e2d017bd20cdc0cb3910de603e7bea9512a6c351a8dd3c9df212ab03d73
+FROM cgr.dev/chainguard/wolfi-base:latest@sha256:73f2cab0f11208427595d4bdd784046bc4116ef7cc52f0c1b48b6b7f820288d5
 
 ARG BUILD_SERIES=dev
 ARG BUILD_ID=0

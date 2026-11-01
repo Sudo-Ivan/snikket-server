@@ -34,19 +34,19 @@ if ! test -d /snikket/prosody; then
 	install -o prosody -g prosody -m 750 -d /snikket/prosody;
 fi
 
-chown -R prosody:prosody /var/spool/anacron /var/run/prosody /snikket/prosody /etc/prosody
+chown -R prosody:prosody /var/run/prosody /snikket/prosody /etc/prosody
 
 ## Give the TURN service access only to its own database and shared TLS keys
-chgrp turnserver /snikket/prosody
+chgrp 65532 /snikket/prosody
 chmod 0710 /snikket/prosody
-install -d -o turnserver -g turnserver -m 0700 /snikket/prosody/turnserver
-chown turnserver:turnserver /snikket/prosody/turnserver
+install -d -o turnserver -g 65532 -m 0700 /snikket/prosody/turnserver
+chown turnserver:65532 /snikket/prosody/turnserver
 chmod 0700 /snikket/prosody/turnserver
 if test -f /snikket/prosody/turndb && ! test -e /snikket/prosody/turnserver/turndb; then
 	mv /snikket/prosody/turndb /snikket/prosody/turnserver/turndb
 fi
 if test -f /snikket/prosody/turnserver/turndb; then
-	chown turnserver:turnserver /snikket/prosody/turnserver/turndb
+	chown turnserver:65532 /snikket/prosody/turnserver/turndb
 	chmod 0600 /snikket/prosody/turnserver/turndb
 fi
 

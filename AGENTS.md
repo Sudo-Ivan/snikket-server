@@ -17,6 +17,8 @@ Monorepo of the four Snikket server components:
 - ProsodyX is pinned in the root `Dockerfile` by tag and commit. Snikket
   module sources are pinned in `ansible/snikket.yml` with
   `prosody_modules.revision`.
+- Server runtime uses a digest-pinned Chainguard Wolfi base. Debian stages
+  fetch signed source packages and generate build-time configuration.
 
 ## Test locally
 

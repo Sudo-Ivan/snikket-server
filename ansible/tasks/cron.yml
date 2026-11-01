@@ -1,15 +1,9 @@
 ---
 
-- name: Install anacron
-  apt:
-    name: anacron
-    state: present
-    install_recommends: no
-- name: "Remove system cron scripts"
+- name: "Create daily jobs directory"
   file:
-    path: "/etc/cron.daily/{{item}}"
-    state: absent
-  loop:
-    - apt-compat
-    - dpkg
-    - passwd
+    path: /etc/cron.daily
+    state: directory
+    owner: root
+    group: root
+    mode: 0755

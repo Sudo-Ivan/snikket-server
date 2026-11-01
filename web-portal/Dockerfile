@@ -23,7 +23,7 @@ RUN echo "$BUILD_SERIES $BUILD_ID" > /opt/snikket-web-portal/.app_version \
     && chown 65532:65532 /snikket
 
 
-FROM cgr.dev/chainguard/wolfi-base:latest@sha256:88a20e2d017bd20cdc0cb3910de603e7bea9512a6c351a8dd3c9df212ab03d73 AS dependencies
+FROM cgr.dev/chainguard/wolfi-base:latest@sha256:73f2cab0f11208427595d4bdd784046bc4116ef7cc52f0c1b48b6b7f820288d5 AS dependencies
 
 RUN apk add --no-cache python-3.13-dev=3.13.18_git20261030-r0
 
@@ -40,7 +40,7 @@ RUN "$VIRTUAL_ENV/bin/pip" install --no-cache-dir --require-hashes -r /tmp/requi
         "$VIRTUAL_ENV/bin/pip"*
 
 
-FROM cgr.dev/chainguard/wolfi-base:latest@sha256:88a20e2d017bd20cdc0cb3910de603e7bea9512a6c351a8dd3c9df212ab03d73
+FROM cgr.dev/chainguard/wolfi-base:latest@sha256:73f2cab0f11208427595d4bdd784046bc4116ef7cc52f0c1b48b6b7f820288d5
 
 RUN apk add --no-cache \
         ca-certificates-bundle=20261020-r0 \

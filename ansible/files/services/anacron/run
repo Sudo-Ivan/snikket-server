@@ -1,5 +1,10 @@
-#!/bin/sh -e
+#!/bin/sh
 
-while /usr/sbin/anacron -d -n; do
-	sleep 3600;
+while :; do
+	for job in /etc/cron.daily/*; do
+		if [ -x "$job" ] && ! "$job"; then
+			echo "EE: Daily job failed: $job"
+		fi
+	done
+	sleep 86400
 done
